@@ -43,3 +43,50 @@ if __name__ == "__main__":
 ### 查看现有的请求函数的参数与响应
 运行后在浏览器中访问 http://127.0.0.1:8000/docs
 ![1754408182972](image/README/1754408182972.png)
+
+## Day 02 路径参数和查询参数
+### 路径参数
+在路径中定义参数，参数会作为函数的参数传入
+函数的顺序很重要，小范围在前，大范围在后，默认使用第一个，限制user_id为int类型
+![1754489907100](image/README/1754489907100.png)
+
+对于枚举类型的路径参数，通过创建枚举类实现
+```python
+# 定义一个枚举类
+from enum import Enum
+class Gender(str, Enum):
+    male = 'male'
+    female = 'female'
+
+@app.get("/students/{gender}")
+async def get_user(gender: Gender):
+    return {"student": f"This is a {gender.value} student"}
+```
+
+### 查询参数
+查询参数是URL中`?`后面的参数，可以有多个，多个参数之间用`&`连接
+把查询参数放在请求函数的参数中即可，FastAPI会自动识别
+没有在路径参数里面定义都是查询参数
+![1754491749962](image/README/1754491749962.png)
+
+代码示例
+```python
+@app.get("/users")
+async def get_users(page_index: int , page_size: int ):
+    # page_index: 页码
+    # page_size: 每页显示的条数
+    return {"page_info": f"index is {page_index}, size is {page_size}"}
+```
+
+### 可选查询参数
+通过`typing`模块的`Optional`类型实现可选查询参数默认值；
+
+```python
+from typing import Optional
+@app.get("/users")
+async def get_users(page_index: int , page_size: Optional[int] = 30):
+    # page_index: 页码
+    # page_size: 每页显示的条数，默认值为30
+    return {"page_info": f"index is {page_index}, size is {page_size}"}
+```
+
